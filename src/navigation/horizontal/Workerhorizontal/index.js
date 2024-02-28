@@ -8,6 +8,7 @@ const navigation = () => {
   const role = JSON.parse(localStorage.getItem('userData'))
 
   // console.log('role = ' + role.role)
+  // console.log('role = ' + role)
 
   return [
     {

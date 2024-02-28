@@ -18,43 +18,93 @@ import AnalyticsCongratulations from 'src/views/dashboards/analytics/AnalyticsCo
 
 import AnalyticsTotalTransactions from 'src/views/dashboards/analytics/AnalyticsTotalTransactions'
 import AnalyticsProjectStatistics from 'src/views/dashboards/analytics/AnalyticsProjectStatistics'
+import { useContext } from 'react'
+import { AuthContext } from 'src/context/AuthContext'
+import AnalyticsSessions from 'src/views/dashboards/analytics/AnalyticsSessions'
+import AnalyticsPerformance from 'src/views/dashboards/analytics/AnalyticsPerformance'
+import AnalyticsTotalRevenue from 'src/views/dashboards/analytics/AnalyticsTotalRevenue'
+import AnalyticsOverview from 'src/views/dashboards/analytics/AnalyticsOverview'
+import AnalyticsTopReferralSources from 'src/views/dashboards/analytics/AnalyticsTopReferralSources'
+import AnalyticsVisitsByDay from 'src/views/dashboards/analytics/AnalyticsVisitsByDay'
 
 const AnalyticsDashboard = () => {
+  const { analytics } = useContext(AuthContext)
+  console.log(analytics)
+  console.log(analytics.topTwoSubTransactions)
+
   return (
     <ApexChartWrapper>
       <Grid container spacing={6} className='match-height'>
-        <Grid item xs={12} md={8}>
+        {/* <Grid item xs={12} md={8}>
           <AnalyticsCongratulations />
-        </Grid>
-        {/* <Grid item xs={6} md={4}>
+        </Grid> */}
+        <Grid item xs={6} md={5}>
           <CardStatisticsVertical
-            stats='155k'
+            stats={analytics.totalTodayProductionQty} //'155k'
             color='primary'
             trendNumber='+22%'
-            title='Total Orders'
-            chipText='Last 4 Month'
-            icon={<Icon icon='mdi:cart-plus' />}
+            title='Today Production'
+            chipText={new Date().toLocaleDateString()} //'Last 4 Month'
+            icon={<Icon icon='mdi:package-variant-closed' />}
           />
-        </Grid> */}
+        </Grid>
+        <Grid item xs={6} md={2}>
+          <AnalyticsSessions />
+        </Grid>
 
-        {/* <Grid item xs={12} md={12}>
-          <AnalyticsTotalTransactions />
-        </Grid> */}
+        <Grid item xs={6} md={5}>
+          <CardStatisticsVertical
+            stats={analytics.totalTodayDispatchQty} //'155k'
+            color='primary'
+            trendNumber='+22%'
+            title='Today Dispatched'
+            chipText={new Date().toLocaleDateString()} //'Last 4 Month'
+            icon={<Icon icon='mdi:ambulance' />}
+          />
+        </Grid>
 
-        {/* <Grid item xs={12} sm={6} md={4}>
-          <AnalyticsProjectStatistics />
-        </Grid> */}
+        <Grid item xs={12} md={12}>
+          <AnalyticsTotalTransactions data={analytics.weeks} />
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
+          <AnalyticsPerformance />
+        </Grid>
+        <Grid item xs={6}>
+          <AnalyticsTotalRevenue />
+        </Grid>
+        <Grid item xs={6}>
+          <AnalyticsOverview />
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
+          <AnalyticsProjectStatistics
+            topFive={analytics.topTwoSubTransactions ? analytics.topTwoSubTransactions : null}
+          />
+        </Grid>
 
-        {/* <Grid item xs={12} sm={6} md={4}>
-          <AnalyticsSalesCountry />
+        <Grid item xs={12} sm={6} md={4}>
+          <AnalyticsSalesCountry topFive={analytics.topTwoAddTransactions} />
+        </Grid>
+        {/* <Grid item xs={12} md={8}>
+          <AnalyticsTopReferralSources />
         </Grid> */}
+        <Grid item xs={12} sm={6} md={4}>
+          <AnalyticsVisitsByDay />
+        </Grid>
+        {/* <Grid item xs={12} md={8}>
+    <AnalyticsActivityTimeline />
+  </Grid> */}
 
-        {/* <Grid item xs={12} sm={6} md={4}>
+        <Grid item xs={12} sm={6} md={4}>
           <AnalyticsWeeklySales />
-        </Grid> */}
+        </Grid>
       </Grid>
     </ApexChartWrapper>
   )
+}
+
+AnalyticsDashboard.acl = {
+  action: 'read',
+  subject: 'acl-page'
 }
 
 export default AnalyticsDashboard

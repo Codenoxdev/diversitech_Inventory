@@ -289,7 +289,8 @@ const MasterEdit = () => {
                                   const updatedRow = { ...row, item_description: event.target.value }
                                   handleRowUpdate(updatedRow)
                                 }}
-                                InputProps={{ readOnly: true }}
+
+                                // InputProps={{ readOnly: true }}
                               />
                             </Grid>
                             {product_type == 'BUS' && (
@@ -546,38 +547,41 @@ const MasterEdit = () => {
                                 renderInput={params => <TextField {...params} label='Active' variant='outlined' />}
                               />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
-                              <input
-                                type='file'
-                                accept='applicatiton/pdf'
-                                style={{ display: 'none' }}
-                                onChange={handlefiletImage}
-                                id='file-image-upload-input'
-                              />
-                              <label htmlFor='file-image-upload-input'>
-                                <Button variant='contained' component='span' color='primary'>
-                                  File
-                                </Button>
-                              </label>
-                              {product_type == 'PART' ? (
-                                JSON.parse(row.image_url).partimage1 ? (
-                                  <a
-                                    href={JSON.parse(row.image_url).partimage1}
-                                    target='_blank'
-                                    rel='noopener noreferrer'
-                                  >
-                                    PDF
-                                  </a>
-                                ) : null
-                              ) : product_type == 'SEAT' || product_type == 'FRAME' ? (
-                                JSON.parse(row.image_url).file3 ? (
-                                  <a href={JSON.parse(row.image_url).file3} target='_blank' rel='noopener noreferrer'>
-                                    PDF
-                                  </a>
-                                ) : null
-                              ) : null}
-                              {/* <a href={JSON.parse(row.image_url).partimage1} target="_blank" rel="noopener noreferrer">PDF</a> */}
-                            </Grid>
+                            {product_type !== 'BUS' && (
+                              <Grid item xs={12} sm={6}>
+                                <input
+                                  type='file'
+                                  accept='applicatiton/pdf'
+                                  style={{ display: 'none' }}
+                                  onChange={handlefiletImage}
+                                  id='file-image-upload-input'
+                                />
+                                <label htmlFor='file-image-upload-input'>
+                                  <Button variant='contained' component='span' color='primary'>
+                                    File
+                                  </Button>
+                                </label>
+                                {product_type == 'PART' ? (
+                                  JSON.parse(row.image_url).partimage1 ? (
+                                    <a
+                                      href={JSON.parse(row.image_url).partimage1}
+                                      target='_blank'
+                                      rel='noopener noreferrer'
+                                    >
+                                      PDF
+                                    </a>
+                                  ) : null
+                                ) : product_type == 'SEAT' || product_type == 'FRAME' ? (
+                                  JSON.parse(row.image_url).file3 ? (
+                                    <a href={JSON.parse(row.image_url).file3} target='_blank' rel='noopener noreferrer'>
+                                      PDF
+                                    </a>
+                                  ) : null
+                                ) : null}
+                                {/* <a href={JSON.parse(row.image_url).partimage1} target="_blank" rel="noopener noreferrer">PDF</a> */}
+                              </Grid>
+                            )}
+
                             {product_type == 'PART' && (
                               <>
                                 <Grid container item xs={12} spacing={2} marginTop={2}>

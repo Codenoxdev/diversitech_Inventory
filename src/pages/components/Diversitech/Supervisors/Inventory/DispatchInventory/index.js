@@ -17,6 +17,7 @@ import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline'
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
 import * as XLSX from 'xlsx'
 import Icon from 'src/@core/components/icon'
+import authConfig from 'src/configs/auth'
 
 const DWBusInventory = () => {
   const Router = useRouter()
@@ -79,7 +80,7 @@ const DWBusInventory = () => {
   }
   React.useEffect(() => {
     try {
-      const response = fetch('/api/Diversitech/Supervisors/Dispatch/Busview', {
+      const response = fetch(authConfig.DispatchBusView, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -94,8 +95,6 @@ const DWBusInventory = () => {
           return response.json()
         })
         .then(data => {
-          // console.log('API Response:', data)
-          // console.log(data + '=========data')
           setBusPlans(data)
           setLoading(false)
         })
@@ -277,6 +276,11 @@ const DWBusInventory = () => {
       </Grid>
     </>
   )
+}
+
+DWBusInventory.acl = {
+  action: 'read',
+  subject: 'acl-page'
 }
 
 export default DWBusInventory

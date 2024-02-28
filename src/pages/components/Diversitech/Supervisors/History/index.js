@@ -241,7 +241,7 @@ const Historypage = () => {
           Export
         </Button>
 
-        <Typography style={{ fontWeight: 'bold' }} variant='h5' sx={{ mb: 4.5 }}>
+        <Typography style={{ fontWeight: 'bold' }} variant='h5' sx={{ mb: 4.5, fontFamily: 'Aptos Serif' }}>
           Stock Ledger
         </Typography>
 
@@ -271,13 +271,17 @@ const Historypage = () => {
 
           <TableBody>
             {loading ? (
-              <TableRow key='loading'>
-                <TableCell colSpan={4}>Loading...</TableCell>
-              </TableRow>
+              <StyledTableRow>
+                <StyledTableCell align='center' colSpan={4}>
+                  <Typography>Loading...</Typography>
+                </StyledTableCell>
+              </StyledTableRow>
             ) : filteredDispatchseats.length === 0 ? (
-              <TableRow key='no-data'>
-                <TableCell colSpan={4}>No data available</TableCell>
-              </TableRow>
+              <StyledTableRow>
+                <StyledTableCell align='center' colSpan={9}>
+                  <Typography>No Record is Here</Typography>
+                </StyledTableCell>
+              </StyledTableRow>
             ) : searchTerm || Type || status || fromDate || toDate ? (
               filteredDispatchseats.map((row, index) => {
                 const uniqueKey = `row-${index}`
@@ -315,6 +319,11 @@ const Historypage = () => {
       </TableContainer>
     </>
   )
+}
+
+Historypage.acl = {
+  action: 'read',
+  subject: 'acl-page'
 }
 
 export default Historypage

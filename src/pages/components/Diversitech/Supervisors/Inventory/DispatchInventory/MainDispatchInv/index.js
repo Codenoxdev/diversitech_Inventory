@@ -14,6 +14,7 @@ import TableCell, { tableCellClasses } from '@mui/material/TableCell'
 import SearchIcon from '@mui/icons-material/Search'
 import * as XLSX from 'xlsx'
 import Icon from 'src/@core/components/icon'
+import authConfig from 'src/configs/auth'
 
 const MainInventoryDispatch = () => {
   const router = useRouter()
@@ -76,7 +77,7 @@ const MainInventoryDispatch = () => {
 
   const fetchBusPlans = async () => {
     try {
-      const response = await fetch('/api/Diversitech/Supervisors/Inventory/DispatchSeatInventory', {
+      const response = await fetch(authConfig.DispatchSeatInventory, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -84,10 +85,6 @@ const MainInventoryDispatch = () => {
         body: JSON.stringify({ plan_no, seats_no })
       })
       const data = await response.json()
-
-      // console.log('Check=' + data)
-
-      // Ensure that the data received is an array before setting it to busPlans
       if (Array.isArray(data)) {
         setInventory(data)
       } else {
@@ -96,7 +93,7 @@ const MainInventoryDispatch = () => {
       setLoading(false)
     } catch (error) {
       console.error(error)
-      setInventory([]) // Initialize as an empty array on error
+      setInventory([])
       setLoading(false)
     }
   }
@@ -253,6 +250,11 @@ const MainInventoryDispatch = () => {
       </Grid>
     </>
   )
+}
+
+MainInventoryDispatch.acl = {
+  action: 'read',
+  subject: 'acl-page'
 }
 
 export default MainInventoryDispatch

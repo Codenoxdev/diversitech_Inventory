@@ -224,8 +224,18 @@ export default async function handler(req, res) {
         SET item_code = ?, item_description = ?, material = ?, unit = ?,category = ? , image_url = ? , dwg_division = ?
         WHERE item_id = ? AND product_type = ?;`
       }
+      console.log(image_url)
 
-      const imageUrlObject = JSON.parse(image_url)
+      // const imageUrlObject = JSON.parse(image_url)
+      let imageUrlObject = null
+
+      product_type === 'BUS' ? (imageUrlObject = null) : (imageUrlObject = JSON.parse(image_url))
+
+      // try {
+      //   imageUrlObject = JSON.parse(image_url)
+      // } catch (error) {
+      //   console.error('Error parsing image_url:', error)
+      // }
 
       for (const key of ['file0', 'file1', 'file2', 'partimage0', 'partimage1']) {
         if (fileUrls[key]) {

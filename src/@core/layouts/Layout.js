@@ -8,6 +8,7 @@ import HorizontalLayout from './HorizontalLayout'
 const Layout = props => {
   // ** Props
   const { hidden, children, settings, saveSettings } = props
+  console.log(settings.navCollapsed)
 
   // ** Ref
   const isCollapsed = useRef(settings.navCollapsed)

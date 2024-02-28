@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import * as Yup from 'yup'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader'
+import authConfig from 'src/configs/auth'
 
 // ** MUI Imports
 
@@ -17,11 +18,12 @@ import TextField from '@mui/material/TextField'
 import CardContent from '@mui/material/CardContent'
 import CardActions from '@mui/material/CardActions'
 
-import { Autocomplete } from '@mui/material'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+import { Autocomplete, Dialog, DialogContent, Typography } from '@mui/material'
+import { get_coordinates } from 'src/pages/handle'
 
 const AddInventory = () => {
   const addMasterItem = async values => {
+    console.log(values.storeAreas)
     const formData = new FormData()
     formData.append('item_code', values.item_code)
     formData.append('item_description', values.item_description)
@@ -47,9 +49,13 @@ const AddInventory = () => {
     formData.append('file2', values.file2)
     formData.append('partimage', values.partimage)
     formData.append('filedata', values.fileData)
+    formData.append('storeAreas', values.storeAreas)
+
+    console.log('first = ', values.storeAreas)
+    console.log('first = ', formData)
 
     try {
-      fetch('/api/Diversitech/Supervisors/Addinventory/imageBackend', {
+      fetch(authConfig.AddInventoryData, {
         method: 'POST',
         body: formData
       })
@@ -128,7 +134,8 @@ const AddInventory = () => {
       file1: null,
       file2: null,
       partimage: null,
-      fileData: null
+      fileData: null,
+      storeAreas: null
     },
     validationSchema: validationSchema,
     onSubmit: (values, { resetForm }) => {
@@ -153,7 +160,8 @@ const AddInventory = () => {
         file1: values.file1,
         file2: values.file2,
         partimage: values.partimage,
-        fileData: values.fileData
+        fileData: values.fileData,
+        storeAreas: values.storeAreas
       })
 
       // }
@@ -161,109 +169,12 @@ const AddInventory = () => {
     }
   })
 
-  // const partsData = {
-  //   part1: {
-  //     partno: 'part1',
-  //     description: 'desc1',
-  //     material: 'mat1',
-  //     unit: 'unit1',
-  //     image: '/image/Back/bseats.png'
-  //   },
-  //   part2: {
-  //     partno: 'part2',
-  //     description: 'desc2',
-  //     material: 'mat2',
-  //     unit: 'unit2',
-  //     image: '/image/Front/seats.png'
-  //   }
-  // }
-
-  // const partsDataBom = {
-  //   partBom1: {
-  //     partno: 'part bom1',
-  //     description: 'desc bom1',
-  //     material: 'mat bom1',
-  //     unit: 'unit bom1',
-  //     image: '/image/Back/bseats.png'
-  //   },
-  //   partBom2: {
-  //     partno: 'part bom2',
-  //     description: 'desc bom2',
-  //     material: 'mat bom2',
-  //     unit: 'unit bom2',
-  //     image: '/image/Front/seats.png'
-  //   }
-  // }
-
-  // const handleSelectChange = (event, idx) => {
-  //   const selectedPart = partsData[event.target.value]
-  //   if (selectedPart) {
-  //     const updatedRows = [...rowsForFirstTab]
-  //     updatedRows[idx] = { ...updatedRows[idx], ...selectedPart }
-  //     setRowsForFirstTab(updatedRows)
-  //   }
-  // }
-
-  // const [bomItems, setBomItems] = useState([
-  //   {
-  //     partno: 'bomPart1',
-  //     description: 'first',
-  //     dwgrevision: 'first',
-  //     material: 'first',
-  //     qty: 10,
-  //     unit: 'first',
-  //     image: '/image/Back/bseats.png'
-  //   },
-  //   {
-  //     partno: 'bomPart2',
-  //     description: 'second',
-  //     dwgrevision: 'second',
-  //     material: 'second',
-  //     qty: 20,
-  //     unit: 'second',
-  //     image: '/image/Front/seats.png'
-  //   },
-  //   {
-  //     partno: 'sampleBombPart',
-  //     description: 'first',
-  //     dwgrevision: 'first',
-  //     material: 'first',
-  //     qty: 10,
-  //     unit: 'first',
-  //     image: '/image/Back/bseats.png'
-  //   }
-  // ])
-
   const [currentBomItem, setCurrentBomItem] = useState(null)
 
   const handleBOMSelectChange = value => {
     setCurrentBomItem(value)
     masterItemFormik?.setFieldValue('product_type', value?.product_id)
   }
-
-  // const handleQTYChange = (event, idx) => {
-  //   const updatedRows = [...selectedBomItems]
-  //   updatedRows[idx] = { ...updatedRows[idx], qty: event.target.value }
-  //   setSelectedBomItems(updatedRows)
-  // }
-
-  // const [category, setCategory] = useState('')
-  // const [partType, setPartType] = useState('')
-
-  // const handleCategoryChange = event => {
-  //   setCategory(event.target.value)
-  // }
-
-  // const handlePartTypeChange = event => {
-  //   setPartType(event.target.value)
-  // }
-
-  // const handleCreateBOM = () => {
-  //   if (currentBomItem) {
-  //     const filteredData = bomItems.filter(bomItem => bomItem.partno === currentBomItem)
-  //     setSelectedBomItems([...selectedBomItems, filteredData[0]])
-  //   }
-  // }
 
   const masterItemType = [
     { product_id: 'BUS', product_desc: 'Bus' },
@@ -295,7 +206,7 @@ const AddInventory = () => {
 
   const fetchFrameList = async () => {
     try {
-      const response = fetch('/api/Diversitech/Supervisors/Addinventory/FrameList/', {
+      fetch(authConfig.AddInventoryFrameList, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -333,38 +244,6 @@ const AddInventory = () => {
     } else {
       console.log('No file selected')
     }
-
-    // masterItemFormik?.setFieldValue('file', file)
-    // console.log('file = ' + file)
-
-    // const formData = new FormData()
-    // formData.append('file', file)
-
-    // const formData = new FormData()
-    // formData.append('file', file) // Assuming 'file' is the input field name
-    // console.log('formData = ' + formData)
-
-    // fetch('/api/Diversitech/Supervisors/Addinventory/addInventory', {
-    //   method: 'POST',
-    //   body: formData
-    // })
-
-    // const response = await fetch('/api/Diversitech/Supervisors/Addinventory/uploadimage', {
-    //   method: 'POST',
-    //   body: formData,
-    //   headers: {
-    //     'Content-Type': 'multipart/form-data'
-    //   }
-    // })
-
-    // const data = await response.json()
-    // console.log(data)
-
-    // // Handle success response here
-    // toast.success(data.message, {
-    //   position: toast.POSITION.TOP_RIGHT,
-    //   autoClose: 1500 // Display the toast for 1.5 seconds
-    // })
   }
 
   const handlefiletImage = async event => {
@@ -422,14 +301,59 @@ const AddInventory = () => {
     setimage2(imageUrl)
   }
 
-  // const [buttonImages, setButtonImages] = useState([])
+  const [popupPath, setPopUpPath] = useState('')
+  const [open, setOpen] = useState(false)
 
-  // const addNewButton = () => {
-  //   const newButtonImages = [...buttonImages, '/image/Assembly']
-  //   setButtonImages(newButtonImages)
+  const imagePopup = row => {
+    setPopUpPath(row)
+  }
+
+  const [clickedArea, setClickedArea] = useState(null)
+  const [clickedAreaName, setClickedAreaName] = useState('')
+  const [clickedAreaStatus, setClickedAreaStatus] = useState('')
+  const [storeAreas, setStoreAreas] = useState([])
+
+  console.log(storeAreas)
+
+  const handleClick = event => {
+    get_coordinates(event, setClickedArea)
+  }
+
+  const handleClickAreaName = (event, value) => {
+    setClickedAreaName(event.target.value)
+    setClickedAreaStatus(value)
+  }
+
+  const handleAddCoordinates = () => {
+    const exist = storeAreas.find(area => area.name === clickedAreaName)
+    if (exist) {
+      console.log('Already Exist')
+    } else if (clickedArea && clickedAreaName) {
+      const newArea = {
+        x_axis: clickedArea.x,
+        y_axis: clickedArea.y,
+        name: clickedAreaName,
+        value: clickedAreaStatus
+      }
+      setStoreAreas(prevAreas => [...prevAreas, newArea])
+    }
+    masterItemFormik?.setFieldValue('storeAreas', storeAreas)
+    setClickedArea(null)
+    setClickedAreaName('')
+    setClickedAreaStatus('')
+  }
+
+  // const get_coordinates = event => {
+  //   const image = event.target
+  //   const rect = image.getBoundingClientRect()
+  //   const x = event.clientX - rect.left
+  //   const y = event.clientY - rect.top
+  //   console.log(x + 'and' + y)
+
+  //   setClickedArea({ x, y })
   // }
 
-  // console.log(buttonImages)
+  // const
 
   return (
     <Grid container spacing={2}>
@@ -501,28 +425,6 @@ const AddInventory = () => {
                             }}
                             InputLabelProps={{ shrink: true }}
                           />
-                          {/* <Autocomplete
-                            fullWidth
-                            options={variantOptions || []}
-                            getOptionLabel={option => (option?.variant_desc ? option?.variant_desc : '')}
-                            value={masterItemFormik?.values?.variant}
-                            onChange={(event, value) => {
-                              // console.log('Value variant = ' + value)
-                              masterItemFormik?.setFieldValue('variant', value)
-                            }}
-                            renderInput={params => <TextField {...params} label='Variant' variant='outlined' />}
-                          /> */}
-                          {/* <Grid item xs={12} sm={6}>
-                          <Autocomplete
-                            options={variantOptions || []}
-                            getOptionLabel={option => (option?.variant_desc ? option?.variant_desc : '')}
-                            value={masterItemFormik?.values?.variant.variant_desc}
-                            onChange={(event, value) => {
-                              console.log('Value variant = ' + value.variant_desc)
-                              masterItemFormik?.setFieldValue('variant', value.variant_desc)
-                            }}
-                            renderInput={params => <TextField {...params} label='Variant' variant='outlined' />}
-                          /> */}
                         </Grid>
                         <Grid item xs={12} sm={6}>
                           <TextField
@@ -535,15 +437,6 @@ const AddInventory = () => {
                             }}
                             InputLabelProps={{ shrink: true }}
                           />
-                          {/* <Autocomplete
-                            options={modelOptions || []}
-                            getOptionLabel={option => (option?.model_desc ? option?.model_desc : '')}
-                            value={masterItemFormik?.values?.model}
-                            onChange={(event, value) => {
-                              masterItemFormik?.setFieldValue('model', value)
-                            }}
-                            renderInput={params => <TextField {...params} label='Model' variant='outlined' />}
-                          /> */}
                         </Grid>
                         <Grid item xs={12} sm={6}>
                           <TextField
@@ -556,15 +449,6 @@ const AddInventory = () => {
                             }}
                             InputLabelProps={{ shrink: true }}
                           />
-                          {/* <Autocomplete
-                            options={bsTypeOptions || []}
-                            getOptionLabel={option => (option?.bs_type_desc ? option?.bs_type_desc : '')}
-                            value={masterItemFormik?.values?.bs_type}
-                            onChange={(event, value) => {
-                              masterItemFormik?.setFieldValue('bs_type', value)
-                            }}
-                            renderInput={params => <TextField {...params} label='BS Type' variant='outlined' />}
-                          /> */}
                         </Grid>
                       </>
                     )}
@@ -644,7 +528,6 @@ const AddInventory = () => {
                         </Grid>
                       </>
                     )}
-
                     {(currentBomItem?.product_id == 'SEAT' ||
                       currentBomItem?.product_id == 'FRAME' ||
                       currentBomItem?.product_id == 'PART') && (
@@ -661,7 +544,6 @@ const AddInventory = () => {
                         />
                       </Grid>
                     )}
-
                     {currentBomItem?.product_id == 'FRAME' && (
                       <>
                         <Grid item xs={12} sm={6}>
@@ -723,7 +605,6 @@ const AddInventory = () => {
                         </Grid>
                       </>
                     )}
-
                     {(currentBomItem?.product_id == 'FRAME' || currentBomItem?.product_id == 'PART') && (
                       <>
                         <Grid item xs={12} sm={6}>
@@ -742,7 +623,6 @@ const AddInventory = () => {
                         </Grid>
                       </>
                     )}
-
                     <Grid item xs={12} sm={6}>
                       <Autocomplete
                         options={activeOptions || []}
@@ -771,7 +651,16 @@ const AddInventory = () => {
                                 Image
                               </Button>
                             </label>
-                            {partimage && <img src={partimage} alt='Image' style={{ height: '50%', width: '100%' }} />}
+                            {partimage && (
+                              <img
+                                src={partimage}
+                                alt='Image'
+                                style={{ height: '50%', width: '100%' }}
+                                onClick={() => {
+                                  imagePopup(partimage), setOpen(true)
+                                }}
+                              />
+                            )}
                           </Grid>
                           <Grid item xs={4} sm={1}>
                             {partimage && (
@@ -832,7 +721,16 @@ const AddInventory = () => {
                             Image
                           </Button>
                         </label>
-                        {image && <img src={image} alt='Front Image' style={{ height: '50%', width: '100%' }} />}
+                        {image && (
+                          <img
+                            src={image}
+                            alt='Front Image'
+                            style={{ height: '50%', width: '100%' }}
+                            onClick={() => {
+                              imagePopup(image), setOpen(true)
+                            }}
+                          />
+                        )}
                       </Grid>
                       <Grid item xs={4} sm={1}>
                         {image && (
@@ -861,14 +759,6 @@ const AddInventory = () => {
                           </Button>
                         </label>
                         {image1 && <p>File uploaded: {image1}</p>}
-
-                        {/* <Canvas>
-                          <ambientLight intensity={0.5} />
-                          <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
-                          <pointLight position={[-10, -10, -10]} /> */}
-                        {/* Render 3D model here */}
-                        {/* <Suspense fallback={null}>{image1 && <Model url={image1} />}</Suspense>
-                        </Canvas> */}
                       </Grid>
                       <Grid item xs={4} sm={1}>
                         {image1 && (
@@ -882,7 +772,6 @@ const AddInventory = () => {
                           />
                         )}
                       </Grid>
-
                       <Grid item xs={12} sm={2}>
                         <input
                           type='file'
@@ -961,6 +850,37 @@ const AddInventory = () => {
               </CardContent>
             </form>
           </Card>
+          <Dialog open={open} onClose={() => setOpen(false)}>
+            <DialogContent>
+              <img
+                alt='Image'
+                width='500px'
+                height='300px'
+                style={{ cursor: 'crosshair' }}
+                src={`${popupPath}` || `/image/logo/unavailable.png`}
+                onClick={handleClick}
+              />
+              <TextField
+                fullWidth
+                label='Part_Name'
+                placeholder='Part Name'
+                value={clickedAreaName}
+                onChange={(event, value) => {
+                  handleClickAreaName(event, 'Normal')
+                }}
+                InputLabelProps={{ shrink: true }}
+              />
+              {/* {clickedArea && (
+                <> */}
+              <Typography>Width = {clickedArea ? clickedArea.x : null} </Typography>
+              <Typography>Height = {clickedArea ? clickedArea.y : null}</Typography>
+              <Button variant='contained' component='span' color='primary' onClick={handleAddCoordinates}>
+                Add
+              </Button>
+              {/* </>
+              )} */}
+            </DialogContent>
+          </Dialog>
         </Grid>
       ) : (
         ''

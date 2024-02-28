@@ -9,7 +9,17 @@ import TableContainer from '@mui/material/TableContainer'
 import TableRow from '@mui/material/TableRow'
 import TableCell, { tableCellClasses } from '@mui/material/TableCell'
 import Link from 'next/link'
-import { Grid, Typography, TextField, Button, Dialog, DialogTitle, DialogContent, Box } from '@mui/material'
+import {
+  Grid,
+  Typography,
+  TextField,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Box,
+  FormHelperText
+} from '@mui/material'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import SearchIcon from '@mui/icons-material/Search'
@@ -17,6 +27,7 @@ import TableSortLabel from '@mui/material/TableSortLabel'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
 import Invoice from '../Invoice/invoice'
+import { Controller, useForm } from 'react-hook-form'
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -160,11 +171,38 @@ const WDTable = () => {
     }
   }
 
+  // const handleInputChange = event => {
+  //   const value = event.target.value
+  //   setInputValue(value)
+  //   setcount(1)
+  //   if (inputValue !== '') {
+  //     const timeout = setTimeout(() => {
+  //       setInputValue('')
+  //     }, 1000)
+
+  //     return () => clearTimeout(timeout)
+  //   }
+  // }
+
   const handleInputChange = event => {
     const value = event.target.value
     setInputValue(value)
-    setcount(1)
-    if (inputValue !== '') {
+    const validPartNumber = Dispatchseats.some(row => row.vecv_part_no === value)
+    if (validPartNumber) {
+      setcount(1)
+      setError('Barcode', null)
+
+      const timeout = setTimeout(() => {
+        setInputValue('')
+      }, 1000)
+
+      return () => clearTimeout(timeout)
+    } else {
+      setError('Barcode', {
+        type: 'manual',
+        message: 'Invalid part number!'
+      })
+
       const timeout = setTimeout(() => {
         setInputValue('')
       }, 1000)
@@ -172,6 +210,18 @@ const WDTable = () => {
       return () => clearTimeout(timeout)
     }
   }
+
+  const {
+    control,
+    setError,
+    handleSubmit,
+    formState: { errors }
+  } = useForm({
+    // defaultValues,
+    mode: 'onBlur'
+
+    // resolver: yupResolver(schema)
+  })
 
   React.useEffect(() => {
     try {
@@ -267,7 +317,7 @@ const WDTable = () => {
           Show Invoice
         </Button>
 
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
+        {/* <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
           <Typography style={{ marginBottom: '8px', fontSize: '16px', fontWeight: 'bold', padding: '5px' }}>
             Barcode
           </Typography>
@@ -280,7 +330,44 @@ const WDTable = () => {
             value={inputValue}
             onChange={handleInputChange}
           />
-        </Box>
+        </Box> */}
+        <form noValidate autoComplete='off' onSubmit={e => e.preventDefault()}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
+            <Typography style={{ marginBottom: '8px', fontSize: '16px', fontWeight: 'bold', padding: '5px' }}>
+              Barcode
+            </Typography>
+
+            {/* <TextField
+            type='Barcode'
+            label='Scan Barcode'
+            id='form-props-Barcode-input'
+            autoComplete='current-Barcode'
+            value={inputValue}
+            onChange={handleInputChange}
+          /> */}
+
+            <Controller
+              name='Barcode'
+              control={control}
+              rules={{ required: true }}
+              render={({ field: { value, onChange, onBlur } }) => (
+                <TextField
+                  autoFocus
+                  label='Scan Barcode'
+                  value={inputValue}
+                  onBlur={onBlur}
+                  onChange={handleInputChange}
+                  helperText={
+                    errors.Barcode && (
+                      <FormHelperText sx={{ color: 'error.main' }}>{errors.Barcode.message}</FormHelperText>
+                    )
+                  }
+                />
+              )}
+            />
+            {/* {errors.Barcode && <FormHelperText sx={{ color: 'error.main' }}>{errors.Barcode.message}</FormHelperText>} */}
+          </Box>
+        </form>
 
         <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'right' }}>
           <TextField

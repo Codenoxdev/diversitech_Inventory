@@ -122,7 +122,7 @@ const WorkerLanding = () => {
             </Link>
           </Grid>
 
-          <Grid item xs={12} md={2}>
+          {/* <Grid item xs={12} md={2}>
             <Link href='/components/Diversitech/Workers/Cowl'>
               <img
                 label='navbar-cowl'
@@ -134,7 +134,7 @@ const WorkerLanding = () => {
                 className={classes.img}
               />
             </Link>
-          </Grid>
+          </Grid> */}
         </Grid>
       </CardContent>
     </Card>

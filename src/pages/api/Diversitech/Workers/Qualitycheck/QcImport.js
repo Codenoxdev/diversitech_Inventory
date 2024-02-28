@@ -8,7 +8,7 @@ export default async function handle(req, res) {
     // console.log(item_code, count_value, plan_no, type, subCount)
     const status = 'QC'
     const Type = type
-    const subtype = 'sub'
+    const subtype = 'fsub'
 
     if (count_value < 0) {
       return res.status(200).json({

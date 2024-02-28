@@ -64,16 +64,16 @@ const SupervisorsAllPlansView = () => {
   const busPlans = SplanView
   const router = useRouter()
 
-  const [page, pagechange] = useState(0)
-  const [rowperpage, rowperpagechange] = useState(5)
+  const [page, pageChange] = useState(0)
+  const [rowPerPage, rowPerPageChange] = useState(5)
 
-  const handlechangepage = (event, newpage) => {
-    pagechange(newpage)
+  const handleChangePage = (event, newpage) => {
+    pageChange(newpage)
   }
 
   const handleRowsPerPage = event => {
-    rowperpagechange(event.target.value)
-    pagechange(0)
+    rowPerPageChange(event.target.value)
+    pageChange(0)
   }
 
   const [loading, setLoading] = React.useState(false)
@@ -213,7 +213,7 @@ const SupervisorsAllPlansView = () => {
           }}
         >
           <Typography></Typography>
-          <Typography variant='h4' style={{ color: 'Black' }}>
+          <Typography variant='h4' style={{ color: 'Black', fontFamily: 'Aptos Serif' }}>
             Planning
           </Typography>
           <Link href='/components/Diversitech/Supervisors/Planning/Production'>
@@ -320,7 +320,7 @@ const SupervisorsAllPlansView = () => {
                       new Date(row.planDate).toLocaleDateString('en-GB').includes(searchTerm) ||
                       row.frameStatus.toLowerCase().includes(searchTerm.toLowerCase())
                   )
-                  .slice(page * rowperpage, page * rowperpage + rowperpage)
+                  .slice(page * rowPerPage, page * rowPerPage + rowPerPage)
                   .map((row, index) => (
                     <StyledTableRow key={index}>
                       {/* {row.frameStatus === 'Open' && ( */}
@@ -447,12 +447,12 @@ const SupervisorsAllPlansView = () => {
         </TableContainer>
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
-          rowsPerPage={rowperpage}
+          rowsPerPage={rowPerPage}
           page={page}
           count={SplanView.length}
           component='div'
-          onPageChange={handlechangepage}
-          onRowsPerPageChange={handleRowsPerPage}
+          onpageChange={handleChangePage}
+          onRowsPerpageChange={handleRowsPerPage}
         ></TablePagination>
       </CardContent>
     </Card>

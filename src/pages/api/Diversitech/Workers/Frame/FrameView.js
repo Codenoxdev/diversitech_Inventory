@@ -28,6 +28,8 @@ JOIN tbl_item_master tim ON tpdb.seat_item_id = tim.item_id
 LEFT JOIN tbl_item_master tim1 ON tim1.item_code = tim.frame_no
 WHERE tpdb.plan_no = ? and tpd.item_id = ?;`
 
+    //diversitech.s3.amazonaws.com/Parts/E141P01522.JPG
+
     //   `
     //   SELECT
     //   tpdb.frame_plan_qty,
@@ -45,7 +47,7 @@ WHERE tpdb.plan_no = ? and tpd.item_id = ?;`
     // WHERE tpdb.plan_no = ? and tpd.item_id = ?;
     //   `
 
-    connection.query(Plandataview, [plan_no, item_id], (err, data) => {
+    https: connection.query(Plandataview, [plan_no, item_id], (err, data) => {
       if (err) {
         res.status(500).json({ error: 'Error fetching data from the database' })
 

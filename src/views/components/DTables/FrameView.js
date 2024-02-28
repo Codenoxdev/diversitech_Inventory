@@ -90,7 +90,7 @@ const FrameView = ({ onPlanSelected }) => {
   })
 
   const imagepopup = row => {
-    setpopuppath(JSON.parse(row.image_url).file0)
+    setpopuppath(JSON.parse(row.image_url).file2)
   }
 
   useEffect(() => {

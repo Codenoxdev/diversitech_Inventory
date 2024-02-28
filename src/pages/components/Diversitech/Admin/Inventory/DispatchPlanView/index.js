@@ -279,7 +279,7 @@ const AdminDispatchPlan = () => {
                             ) : (
                               <>
                                 <StyledTableCell align='left' style={{ width: '2px' }}>
-                                  <IconButton aria-label='Edit' color='primary'>
+                                  <IconButton aria-label='Edit' color='primary' onClick={() => handleEditRoute(row)}>
                                     <EditIcon />
                                   </IconButton>
                                 </StyledTableCell>

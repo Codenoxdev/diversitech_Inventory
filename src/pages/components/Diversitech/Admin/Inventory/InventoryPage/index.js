@@ -5,7 +5,7 @@ import Table from '@mui/material/Table'
 import TableRow from '@mui/material/TableRow'
 import TableHead from '@mui/material/TableHead'
 import TableBody from '@mui/material/TableBody'
-import { CardContent, TableContainer, TextField } from '@mui/material'
+import { CardContent, TableContainer, TablePagination, TextField } from '@mui/material'
 import Link from 'next/link'
 import { Card, Typography, Grid, Box, Dialog, DialogTitle, DialogContent, Button } from '@mui/material'
 import { useRouter } from 'next/router'
@@ -16,6 +16,7 @@ import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import * as XLSX from 'xlsx'
 import Icon from 'src/@core/components/icon'
+import authConfig from 'src/configs/auth'
 
 const InventoryPage = () => {
   // const theme = useTheme()
@@ -45,6 +46,18 @@ const InventoryPage = () => {
       border: 0
     }
   }))
+
+  const [page, pageChange] = useState(0)
+  const [rowPerPage, rowPerPageChange] = useState(25)
+
+  const handleChangePage = (event, newPage) => {
+    pageChange(newPage)
+  }
+
+  const handleRowsPerPage = event => {
+    rowPerPageChange(event.target.value)
+    pageChange(0)
+  }
 
   const handleSortRequest = property => {
     const direction = sortConfig.key === property && sortConfig.direction === 'asc' ? 'dec' : 'asc'
@@ -78,7 +91,7 @@ const InventoryPage = () => {
 
   const fetchBusPlans = async () => {
     try {
-      const response = await fetch('/api/Diversitech/Supervisors/Inventory/summary', {
+      const response = await fetch(authConfig.SummaryEndpoint, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
@@ -132,16 +145,16 @@ const InventoryPage = () => {
   return (
     <Card>
       <CardContent>
-        <Grid item xs={12} md={6}>
-          <Grid>
-            <Typography variant='h5' sx={{ mb: 4.5 }}>
-              Welcome{' '}
-              <Box component='span' sx={{ fontWeight: 'bold' }}>
-                Admin
-              </Box>
-              ! 🎉
-            </Typography>
-          </Grid>
+        <Grid containerxs={12}>
+          {/* <Grid> */}
+          <Typography variant='h5' sx={{ mb: 4.5, fontFamily: 'Aptos Serif' }}>
+            Welcome{' '}
+            <Box component='span' sx={{ fontWeight: 'bold', fontFamily: 'Aptos Serif' }}>
+              Admin
+            </Box>
+            ! 🎉
+          </Typography>
+          {/* </Grid> */}
           <Box
             sx={{
               p: 5,
@@ -162,7 +175,7 @@ const InventoryPage = () => {
               Export
             </Button>
 
-            <Typography style={{ fontWeight: 'bold' }} variant='h5' sx={{ mb: 4.5 }}>
+            <Typography style={{ fontWeight: 'bold', fontFamily: 'Aptos Serif' }} variant='h5' sx={{ mb: 4.5 }}>
               Stock Summary
             </Typography>
 
@@ -232,20 +245,18 @@ const InventoryPage = () => {
                 </StyledTableRow>
               ) : (
                 sortedBusPlans
-                  .filter(
-                    row => row.product_type !== 'BUS' // Exclude rows where product_type is 'BUS'
-                  )
+                  .filter(row => row.product_type !== 'BUS')
+                  .slice(page * rowPerPage, page * rowPerPage + rowPerPage)
                   .map((row, index) =>
                     !searchTerm ||
                     (row.item_code?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
                     (row.product_type?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ? (
                       <StyledTableRow key={index}>
-                        {/* {console.log(row.image_url + '=================')} */}
                         <StyledTableCell align='left'>{row.item_code}</StyledTableCell>
                         <StyledTableCell align='left'>{row.item_description}</StyledTableCell>
                         <StyledTableCell align='left'>{row.product_type}</StyledTableCell>
                         <StyledTableCell align='right'>{row.available_quantity}</StyledTableCell>
-                        {/* {console.log(row.image_url)} */}
+
                         {row.image_url ? (
                           <StyledTableCell align='right'>
                             <img
@@ -293,6 +304,16 @@ const InventoryPage = () => {
             </TableBody>
           </Table>
         </TableContainer>
+
+        <TablePagination
+          rowsPerPageOptions={[25, 50, 10]}
+          rowsPerPage={rowPerPage}
+          page={page}
+          count={sortedBusPlans.length}
+          component='div'
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleRowsPerPage}
+        ></TablePagination>
 
         <Dialog open={open} onClose={() => setopen(false)}>
           <DialogContent>

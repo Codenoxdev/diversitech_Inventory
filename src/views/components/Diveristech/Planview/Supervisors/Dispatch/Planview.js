@@ -223,7 +223,7 @@ const SupervisorsDAllPlansView = () => {
           }}
         >
           <Typography></Typography>
-          <Typography variant='h4' style={{ color: 'Black' }}>
+          <Typography variant='h4' style={{ color: 'Black', fontFamily: 'Aptos Serif' }}>
             Dispatch
           </Typography>
           <Link href='/components/Diversitech/Supervisors/Planning/Dispatch'>

@@ -50,66 +50,90 @@ export const jwtConfig = {
   refreshTokenSecret: process.env.NEXT_PUBLIC_JWT_REFRESH_TOKEN_SECRET
 }
 
-mock.onPost('/jwt/login').reply(request => {
-  const { email, password } = JSON.parse(request.data)
-
-  let error = {
-    email: ['Something went wrong']
-  }
-
-  const user = users.find(u => u.email === email && u.password === password)
-  if (user) {
-    const accessToken = jwt.sign({ id: user.id }, jwtConfig.secret, { expiresIn: jwtConfig.expirationTime })
-
-    const response = {
-      accessToken,
-      userData: { ...user, password: undefined }
-    }
-
-    return [200, response]
-  } else {
-    error = {
-      email: ['email or Password is Invalid']
-    }
-
-    return [400, { error }]
-  }
-})
-
-// mock.onPost('/jwt/login').reply(async request => {
+// mock.onPost('/jwt/login').reply(request => {
 //   const { email, password } = JSON.parse(request.data)
-//   console.log(email, password)
 
-//   try {
-//     const response = await fetch('/api/auth/login', {
-//       method: 'POST',
-//       headers: {
-//         'Content-Type': 'application/json'
-//       },
-//       body: JSON.stringify({ email, password })
-//     })
-//     if (response.ok) {
-//       const data = await response.json()
-//       console.log(data)
+//   let error = {
+//     email: ['Something went wrong']
+//   }
 
-//       if (data.success) {
-//         console.log(data.message)
+//   const user = users.find(u => u.email === email && u.password === password)
+//   if (user) {
+//     const accessToken = jwt.sign({ id: user.id }, jwtConfig.secret, { expiresIn: jwtConfig.expirationTime })
 
-//         return [200, data.message]
-//       } else {
-//         console.log('Not Login')
-//       }
+//     const response = {
+//       accessToken,
+//       userData: { ...user, password: undefined }
 //     }
-//   } catch (error) {
-//     console.error(error)
+
+//     return [200, response]
+//   } else {
+//     error = {
+//       email: ['email or Password is Invalid']
+//     }
+
+//     return [400, { error }]
 //   }
 // })
 
-mock.onPost('/jwt/register').reply(request => {
-  if (request.data.length > 0) {
-    const { email, password, username } = JSON.parse(request.data)
+mock.onPost('/jwt/login').reply(async request => {
+  const { email, password } = JSON.parse(request.data)
+  console.log(email, password)
 
-    console.log(email, password, username)
+  try {
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, password })
+    })
+    if (response.ok) {
+      const data = await response.json()
+      console.log(data)
+
+      if (data.success) {
+        console.log(data.message)
+
+        return [200, data.message]
+      } else {
+        console.log('Not Login')
+      }
+    }
+  } catch (error) {
+    console.error(error)
+  }
+})
+
+mock.onPost('/jwt/register').reply(async request => {
+  if (request.data.length > 0) {
+    const { username, email, password, firstName, lastName, phone, branch_id } = JSON.parse(request.data)
+
+    console.log(username, email, password, firstName, lastName, phone, branch_id)
+
+    try {
+      const response = await fetch('/api/auth/registration', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, email, password, firstName, lastName, phone, branch_id })
+      })
+      if (response.ok) {
+        const data = await response.json()
+        console.log(data)
+
+        if (data.success) {
+          console.log(data.message)
+
+          return [200, data.message]
+        } else {
+          console.log('Not Login')
+        }
+      }
+    } catch (error) {
+      console.error(error)
+    }
 
     // const isEmailAlreadyInUse = users.find(user => user.email === email)
     // const isUsernameAlreadyInUse = users.find(user => user.username === username)
@@ -149,58 +173,61 @@ mock.onPost('/jwt/register').reply(request => {
   }
 })
 
-// mock.onGet('/auth/me').reply(config => {
-//   // ** Get token from header
-//   // @ts-ignore
-//   const token = config.headers.Authorization
+mock.onGet('/auth/me').reply(async config => {
+  const token = config.headers.Authorization
+  let response = [200, {}]
+  jwt.verify(token, jwtConfig.secret, async (err, decoded) => {
+    if (err) {
+      if (defaultAuthConfig.onTokenExpiration === 'logout') {
+        response = [401, { error: { error: 'Invalid User' } }]
+      } else {
+        const oldTokenDecoded = jwt.decode(token, { complete: true })
+        const { id: userId } = oldTokenDecoded.payload
 
-//   // ** Default response
-//   let response = [200, {}]
+        const responses = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(userId)
+        })
+        if (responses.ok) {
+          const data = await response.json()
+          console.log(data)
 
-//   // ** Checks if the token is valid or expired
-//   jwt.verify(token, jwtConfig.secret, (err, decoded) => {
-//     // ** If token is expired
-//     if (err) {
-//       // ** If onTokenExpiration === 'logout' then send 401 error
-//       if (defaultAuthConfig.onTokenExpiration === 'logout') {
-//         // ** 401 response will logout user from AuthContext file
-//         response = [401, { error: { error: 'Invalid User' } }]
-//       } else {
-//         // ** If onTokenExpiration === 'refreshToken' then generate the new token
-//         const oldTokenDecoded = jwt.decode(token, { complete: true })
+          if (data.success) {
+            console.log(data.message.accessToken)
+            console.log(data.message)
+            window.localStorage.setItem(defaultAuthConfig.storageTokenKeyName, data.message.accessToken)
+            const obj = data.message
+            response = [200, obj]
+          } else {
+            console.log('Not Login')
+          }
+        }
+      }
+    } else {
+      const userId = decoded.id
 
-//         // ** Get user id from old token
-//         // @ts-ignore
-//         const { id: userId } = oldTokenDecoded.payload
+      const responses = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(userId)
+      })
+      if (responses.ok) {
+        const data = await response.json()
+        console.log(data)
 
-//         // ** Get user that matches id in token
-//         const user = users.find(u => u.id === userId)
+        if (data.success) {
+          response = [200, data.message]
+        } else {
+          console.log('Not Login')
+        }
+      }
+    }
+  })
 
-//         // ** Sign a new token
-//         const accessToken = jwt.sign({ id: userId }, jwtConfig.secret, {
-//           expiresIn: jwtConfig.expirationTime
-//         })
-
-//         // ** Set new token in localStorage
-//         window.localStorage.setItem(defaultAuthConfig.storageTokenKeyName, accessToken)
-//         const obj = { userData: { ...user, password: undefined } }
-
-//         // ** return 200 with user data
-//         response = [200, obj]
-//       }
-//     } else {
-//       // ** If token is valid do nothing
-//       // @ts-ignore
-//       const userId = decoded.id
-
-//       // ** Get user that matches id in token
-//       const userData = JSON.parse(JSON.stringify(users.find(u => u.id === userId)))
-//       delete userData.password
-
-//       // ** return 200 with user data
-//       response = [200, { userData }]
-//     }
-//   })
-
-//   return response
-// })
+  return response
+})

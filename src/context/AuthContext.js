@@ -18,6 +18,7 @@ const defaultProvider = {
   setUser: () => null,
   setLoading: () => Boolean,
   login: () => Promise.resolve(),
+  register: () => Promise.resolve(),
   logout: () => Promise.resolve()
 }
 const AuthContext = createContext(defaultProvider)
@@ -37,6 +38,11 @@ const AuthProvider = ({ children }) => {
 
   //  ========================SupervisorsProductionPlanView====================
   const [SplanView, setSplanView] = useState([])
+  const [branch, setBranch] = useState()
+  const [analytics, setAnalytics] = useState([])
+
+  // console.log('analytics')
+  // console.log(analytics)
 
   //  ========================SupervisorsDispatchPlanView====================
   const [DplanView, setDplanView] = useState([])
@@ -109,7 +115,7 @@ const AuthProvider = ({ children }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
 
     // ========================MasterIteamGet==============================
-    fetch('/api/Master/masteritem/')
+    fetch(authConfig.MasterDataEndpoint)
       .then(response => {
         if (!response.ok) {
           throw new Error('Network response was not ok')
@@ -130,7 +136,7 @@ const AuthProvider = ({ children }) => {
       })
 
     //  ========================Supervisors_Production_PlanView====================
-    fetch('/api/Diversitech/Supervisors/Production/PlanView/')
+    fetch(authConfig.ProductionPlanViewEndpoint)
       .then(response => {
         if (!response.ok) {
           throw new Error('Network response was not ok')
@@ -146,7 +152,7 @@ const AuthProvider = ({ children }) => {
       })
 
     //  ========================Supervisors_Dispatch_PlanView====================
-    fetch('/api/Diversitech/Supervisors/Dispatch/PlanView/')
+    fetch(authConfig.DispatchPlanViewEndpoint)
       .then(response => {
         if (!response.ok) {
           throw new Error('Network response was not ok')
@@ -156,6 +162,38 @@ const AuthProvider = ({ children }) => {
       })
       .then(data => {
         setDplanView(data)
+      })
+      .catch(error => {
+        console.error('Error fetching master item data:', error)
+      })
+
+    // =============================Diversitech_Branches======================================
+    fetch(authConfig.DiversitechBranchEndpoint)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok')
+        }
+
+        return response.json()
+      })
+      .then(data => {
+        setBranch(data)
+      })
+      .catch(error => {
+        console.error('Error fetching master item data:', error)
+      })
+
+    // =============================Analytics_Endpoints======================================
+    fetch(authConfig.AnalyticsEndpoint)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok')
+        }
+
+        return response.json()
+      })
+      .then(data => {
+        setAnalytics(data.message)
       })
       .catch(error => {
         console.error('Error fetching master item data:', error)
@@ -187,6 +225,27 @@ const AuthProvider = ({ children }) => {
     router.push('/login')
   }
 
+  const handleRegister = (params, errorCallback) => {
+    console.log(params)
+    axios
+      .post(authConfig.registerEndpoint, params)
+      .then(async response => {
+        console.log(response)
+
+        // params.rememberMe
+        //   ? window.localStorage.setItem(authConfig.storageTokenKeyName, response.data.accessToken)
+        //   : null
+        // const returnUrl = router.query.returnUrl
+        // setUser({ ...response.data.userData })
+        // params.rememberMe ? window.localStorage.setItem('userData', JSON.stringify(response.data.userData)) : null
+        // const redirectURL = returnUrl && returnUrl !== '/' ? returnUrl : '/'
+        // router.replace(redirectURL)
+      })
+      .catch(err => {
+        if (errorCallback) errorCallback(err)
+      })
+  }
+
   const values = {
     user,
     role,
@@ -195,6 +254,7 @@ const AuthProvider = ({ children }) => {
     setUser,
     setLoading,
     login: handleLogin,
+    register: handleRegister,
     logout: handleLogout,
     rows,
     setRows,
@@ -223,7 +283,9 @@ const AuthProvider = ({ children }) => {
     DplanView,
     setDplanView,
     selectedDate,
-    setSelectedDate
+    setSelectedDate,
+    branch,
+    analytics
 
     // FilteredRows,
     // setFilteredRows

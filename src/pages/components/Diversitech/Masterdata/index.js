@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useContext } from 'react'
 import { AuthContext } from 'src/context/AuthContext'
 import MasterPage from 'src/views/components/Diveristech/Master/Masterpage'
+import authConfig from 'src/configs/auth'
 
 const Master = () => {
   // const [open, setOpen] = useState(false)

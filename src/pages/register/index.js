@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 
 // ** Next Import
 import Link from 'next/link'
@@ -34,6 +34,10 @@ import { useSettings } from 'src/@core/hooks/useSettings'
 
 // ** Demo Imports
 import FooterIllustrationsV2 from 'src/views/pages/auth/FooterIllustrationsV2'
+import { useForm, Controller } from 'react-hook-form'
+import { Autocomplete, FormHelperText } from '@mui/material'
+import { useAuth } from 'src/hooks/useAuth'
+import { AuthContext } from 'src/context/AuthContext'
 
 // ** Styled Components
 const RegisterIllustrationWrapper = styled(Box)(({ theme }) => ({
@@ -94,6 +98,9 @@ const LinkStyled = styled(Link)(({ theme }) => ({
 const Register = () => {
   // ** States
   const [showPassword, setShowPassword] = useState(false)
+  const { branch } = useContext(AuthContext)
+
+  const auth = useAuth()
 
   // ** Hooks
   const theme = useTheme()
@@ -103,6 +110,34 @@ const Register = () => {
   // ** Vars
   const { skin } = settings
   const imageSource = skin === 'bordered' ? 'misc-under-maintenance' : 'misc-under-maintenance'
+
+  const {
+    control,
+    setError,
+    handleSubmit,
+    formState: { errors }
+  } = useForm({
+    // defaultValues,
+    mode: 'onBlur'
+
+    // resolver: yupResolver(schema)
+  })
+
+  const onSubmit = data => {
+    console.log(data)
+    const { username, email, password, firstName, lastName, phone, branch } = data
+    let branch_id = branch.place_id
+
+    console.log(username, email, password, firstName, lastName, phone, branch_id)
+
+    auth.register({ username, email, password, firstName, lastName, phone, branch_id }, () => {
+      setError('email', 'username', 'phone', {
+        type: 'manual',
+
+        message: 'Credentials Compulsory Fill it First'
+      })
+    })
+  }
 
   return (
     <Box className='content-right'>
@@ -215,29 +250,168 @@ const Register = () => {
               <TypographyStyled variant='h5'>Adventure starts here 🚀</TypographyStyled>
               <Typography variant='body2'>Make your app management easy and fun!</Typography>
             </Box>
-            <form noValidate autoComplete='off' onSubmit={e => e.preventDefault()}>
-              <TextField autoFocus fullWidth sx={{ mb: 4 }} label='Username' placeholder='Username' />
-              <TextField fullWidth label='Email' sx={{ mb: 4 }} placeholder='XYZ@diversitech.com' />
-              <FormControl fullWidth>
-                <InputLabel htmlFor='auth-login-v2-password'>Password</InputLabel>
-                <OutlinedInput
-                  label='Password'
-                  id='auth-login-v2-password'
-                  type={showPassword ? 'text' : 'password'}
-                  endAdornment={
-                    <InputAdornment position='end'>
-                      <IconButton
-                        edge='end'
-                        onMouseDown={e => e.preventDefault()}
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        <Icon icon={showPassword ? 'mdi:eye-outline' : 'mdi:eye-off-outline'} />
-                      </IconButton>
-                    </InputAdornment>
-                  }
+            <form noValidate autoComplete='off' onSubmit={handleSubmit(onSubmit)}>
+              {' '}
+              {/* onSubmit={e => e.preventDefault()} */}
+              <FormControl fullWidth sx={{ mb: 4 }}>
+                <Controller
+                  name='firstName'
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field: { value, onChange, onBlur } }) => (
+                    <TextField
+                      label='First Name'
+                      value={value}
+                      onBlur={onBlur}
+                      onChange={onChange}
+                      error={Boolean(errors.firstName)}
+                      placeholder='XYZ@diversitech.com'
+                    />
+                  )}
                 />
+                {errors.firstName && (
+                  <FormHelperText sx={{ color: 'error.main' }}>{errors.firstName.message}</FormHelperText>
+                )}
               </FormControl>
-
+              <FormControl fullWidth sx={{ mb: 4 }}>
+                <Controller
+                  name='lastName'
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field: { value, onChange, onBlur } }) => (
+                    <TextField
+                      label='Last Name'
+                      value={value}
+                      onBlur={onBlur}
+                      onChange={onChange}
+                      error={Boolean(errors.lastName)}
+                      placeholder='XYZ@diversitech.com'
+                    />
+                  )}
+                />
+                {errors.lastName && (
+                  <FormHelperText sx={{ color: 'error.main' }}>{errors.lastName.message}</FormHelperText>
+                )}
+              </FormControl>
+              <FormControl fullWidth sx={{ mb: 4 }}>
+                <Controller
+                  name='username'
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field: { value, onChange, onBlur } }) => (
+                    <TextField
+                      label='User Name'
+                      value={value}
+                      onBlur={onBlur}
+                      onChange={onChange}
+                      error={Boolean(errors.Username)}
+                      placeholder='XYZ@diversitech.com'
+                    />
+                  )}
+                />
+                {errors.username && (
+                  <FormHelperText sx={{ color: 'error.main' }}>{errors.username.message}</FormHelperText>
+                )}
+              </FormControl>
+              <FormControl fullWidth sx={{ mb: 4 }}>
+                <Controller
+                  name='email'
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field: { value, onChange, onBlur } }) => (
+                    <TextField
+                      label='Email'
+                      value={value}
+                      onBlur={onBlur}
+                      onChange={onChange}
+                      error={Boolean(errors.email)}
+                      placeholder='XYZ@diversitech.com'
+                    />
+                  )}
+                />
+                {errors.email && <FormHelperText sx={{ color: 'error.main' }}>{errors.email.message}</FormHelperText>}
+              </FormControl>
+              <FormControl fullWidth sx={{ mb: 4 }}>
+                <Controller
+                  name='phone'
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field: { value, onChange, onBlur } }) => (
+                    <TextField
+                      label='Phone'
+                      value={value}
+                      onBlur={onBlur}
+                      onChange={onChange}
+                      error={Boolean(errors.phone)}
+                      placeholder='123456789'
+                      InputProps={{
+                        inputProps: {
+                          type: 'number',
+                          pattern: '[0-9]*'
+                        }
+                      }}
+                    />
+                  )}
+                />
+                {errors.phone && <FormHelperText sx={{ color: 'error.main' }}>{errors.phone.message}</FormHelperText>}
+              </FormControl>
+              <FormControl fullWidth sx={{ mb: 4 }}>
+                <InputLabel htmlFor='auth-login-v2-password' error={Boolean(errors.password)}>
+                  Password
+                </InputLabel>
+                <Controller
+                  name='password'
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field: { value, onChange, onBlur } }) => (
+                    <OutlinedInput
+                      value={value}
+                      onBlur={onBlur}
+                      label='Password'
+                      onChange={onChange}
+                      id='auth-login-v2-password'
+                      error={Boolean(errors.password)}
+                      type={showPassword ? 'text' : 'password'}
+                      endAdornment={
+                        <InputAdornment position='end'>
+                          <IconButton
+                            edge='end'
+                            onMouseDown={e => e.preventDefault()}
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            <Icon icon={showPassword ? 'mdi:eye-outline' : 'mdi:eye-off-outline'} fontSize={20} />
+                          </IconButton>
+                        </InputAdornment>
+                      }
+                    />
+                  )}
+                />
+                {errors.password && (
+                  <FormHelperText sx={{ color: 'error.main' }} id=''>
+                    {errors.password.message}
+                  </FormHelperText>
+                )}
+              </FormControl>
+              <FormControl fullWidth sx={{ mb: 4 }}>
+                <Controller
+                  name='branch'
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field: { value, onChange, onBlur } }) => (
+                    <Autocomplete
+                      label='Branch'
+                      value={value}
+                      onChange={(event, newValue) => onChange(newValue)}
+                      options={branch}
+                      getOptionLabel={option => option.comp_code}
+                      renderInput={params => (
+                        <TextField {...params} error={Boolean(errors.branch)} placeholder='Branch_Code' />
+                      )}
+                    />
+                  )}
+                />
+                {errors.branch && <FormHelperText sx={{ color: 'error.main' }}>{errors.branch.message}</FormHelperText>}
+              </FormControl>
               <FormControlLabel
                 control={<Checkbox />}
                 sx={{ mb: 4, mt: 1.5, '& .MuiFormControlLabel-label': { fontSize: '0.875rem' } }}
